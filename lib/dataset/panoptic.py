@@ -134,12 +134,13 @@ class Panoptic(torch.utils.data.Dataset):
 
         if self.image_set == "train":
             self.sequence_list = TRAIN_LIST
-            self._interval = 3
+            self._interval = 1
         elif self.image_set == "validation":
             self.sequence_list = VAL_LIST
-            self._interval = 12
+            self._interval = 1
 
-        self.pred_pose2d = self._get_pred_pose2d(os.path.join(self.dataset_root, "keypoints_{}_results.json".format(self.image_set)))
+        # self.pred_pose2d = self._get_pred_pose2d(os.path.join(self.dataset_root, "keypoints_{}_results.json".format(self.image_set)))
+        self.pred_pose2d = self._get_pred_pose2d(os.path.join(self.dataset_root, "../labels2d_{}.json".format(self.image_set)))
         self.cameras = self._get_cam()
         self.db = self._get_db()
 
@@ -147,6 +148,10 @@ class Panoptic(torch.utils.data.Dataset):
         with open(fp, "r") as f:
             logging.info("=> load {}".format(fp))
             preds = json.load(f)
+
+            for pred in preds:
+                pred["image_name"] = pred["image_name"].replace("/datasets/panoptic/test/", "")
+                pred["image_name"] = pred["image_name"].replace("/datasets/panoptic/train/", "")
 
         if self.is_train:
             image_to_preds = defaultdict(dict)
@@ -197,7 +202,12 @@ class Panoptic(torch.utils.data.Dataset):
             for i, anno_file in enumerate(anno_files):
                 if i % self._interval == 0:
                     with open(anno_file, "r") as f:
-                        bodies = json.load(f)["bodies"]
+                        try:
+                            kpt_data = json.load(f)
+                        except json.decoder.JSONDecodeError:
+                            print("Ignoring file due to reading errors:", f)
+                            continue
+                        bodies = kpt_data["bodies"]
                     if len(bodies) == 0:
                         continue
 
@@ -211,6 +221,9 @@ class Panoptic(torch.utils.data.Dataset):
                             logger.info("Image not found: {}. Skipped.".format(image_path))
                             missing_image = True
                             break
+
+                        if image_path not in self.pred_pose2d:
+                            continue
 
                         our_cam = dict()
                         our_cam['R'] = v['R']
@@ -412,6 +425,10 @@ class Panoptic(torch.utils.data.Dataset):
                 for pose in pred_pose3d:
                     pose3d_pool.append(pose)
 
+            if len(pose3d_pool) == 0:
+                total_gt += len(joints_3d)
+                continue
+
             # === fuse multiple views
             pose3d_pool = np.stack(pose3d_pool, axis=0)  # [N, Nj, 4]
             dist_matrix = np.expand_dims(pose3d_pool[:, :, :3], axis=1) - np.expand_dims(pose3d_pool[:, :, :3], axis=0)  # [N, N, Nj, 3]
@@ -463,7 +480,7 @@ class Panoptic(torch.utils.data.Dataset):
             total_gt += len(joints_3d)
             total_pred += len(pred)
 
-        mpjpe_threshold = [25, 50, 100, 150]
+        mpjpe_threshold = [25, 50, 100, 150, 200, 250, 300, 500]
 
         aps = []
         recs = []

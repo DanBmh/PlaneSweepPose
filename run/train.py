@@ -71,6 +71,17 @@ def main():
 
     model, optimizer = get_optimizer(model)
 
+    # Load pretrained checkpoint
+    from utils.utils import load_checkpoint
+    from core.config import get_model_name
+    from pathlib import Path
+    import os
+    this_dir = Path(os.path.dirname(__file__))
+    root_output_dir = (this_dir / ".." / config.OUTPUT_DIR).resolve()
+    cfg_name = os.path.basename(args.cfg).split(".")[0]
+    output_dir = root_output_dir / config.DATASET.TRAIN_DATASET / get_model_name(config) / cfg_name
+    model, _ = load_checkpoint(model, None, output_dir, filename="model_best_pretrained.pth.tar")
+
     start_epoch = config.TRAIN.BEGIN_EPOCH
     end_epoch = config.TRAIN.END_EPOCH
 

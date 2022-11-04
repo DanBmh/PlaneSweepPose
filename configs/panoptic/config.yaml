@@ -15,7 +15,7 @@ NETWORK:
     SOFTARGMAX_KERNEL_SIZE: 16
 
 DATASET:
-    ROOT: "data/Panoptic"
+    ROOT: "/datasets/panoptic/all/"
     TRAIN_DATASET: "panoptic"
     TRAIN_SUBSET: "train"
     TEST_DATASET: "panoptic"
@@ -30,7 +30,8 @@ TRAIN:
     STEP_PER_EPOCH: 500
 
 TEST:
-    BATCH_SIZE: 64
+    BATCH_SIZE: 5
+    # BATCH_SIZE: 64
     USE_PRED_CONFIDENCE: true
     NMS_THRESHOLD: 250
 
