@@ -140,7 +140,7 @@ class Panoptic(torch.utils.data.Dataset):
             self._interval = 1
 
         # self.pred_pose2d = self._get_pred_pose2d(os.path.join(self.dataset_root, "keypoints_{}_results.json".format(self.image_set)))
-        self.pred_pose2d = self._get_pred_pose2d(os.path.join(self.dataset_root, "../labels2d_{}.json".format(self.image_set)))
+        self.pred_pose2d = self._get_pred_pose2d(os.path.join(self.dataset_root, "labels2d_{}.json".format(self.image_set)))
         self.cameras = self._get_cam()
         self.db = self._get_db()
 
