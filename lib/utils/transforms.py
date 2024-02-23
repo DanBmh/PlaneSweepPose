@@ -96,7 +96,7 @@ def torch_back_project_point(y, depth, R, T, f, c, k, p):
     xcam = xcam * d
     xcam = xcam.reshape(batch_size, 3, -1)  # [B, 3, PJ]
 
-    x = torch.bmm(torch.inverse(R), xcam) + T  # [B, 3, PJ]
+    x = torch.bmm(torch.inverse(R.cpu()).cuda(), xcam) + T  # [B, 3, PJ]
     x = x.transpose(1, 2)  # [B, PJ, 3]
     x = x.reshape(batch_size, num_persons, num_joints, 3)  # [B, P, J, 3]
 

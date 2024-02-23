@@ -47,7 +47,7 @@ def main():
         train_dataset,
         batch_size=config.TRAIN.BATCH_SIZE * len(gpus),
         shuffle=config.TRAIN.SHUFFLE,
-        num_workers=config.WORKERS,
+        # num_workers=config.WORKERS,
         pin_memory=True)
 
     test_dataset = eval("dataset." + config.DATASET.TEST_DATASET)(
@@ -57,7 +57,7 @@ def main():
         test_dataset,
         batch_size=config.TEST.BATCH_SIZE * len(gpus),
         shuffle=False,
-        num_workers=config.WORKERS,
+        # num_workers=config.WORKERS,
         pin_memory=True)
 
     cudnn.benchmark = config.CUDNN.BENCHMARK

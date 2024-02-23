@@ -39,6 +39,11 @@ config.DATASET.PERTURB_SIGMA = 1.0
 config.DATASET.SYNTHESIS_X_RANGE = np.array([-1000, 1000])
 config.DATASET.SYNTHESIS_Y_RANGE = np.array([-1000, 1000])
 
+config.DATASET.SYNTHETIC_IMG_WIDTH = 1920
+config.DATASET.SYNTHETIC_IMG_HEIGHT = 1080
+config.DATASET.NUM_CAMS = 5
+config.DATASET.SYNTHETIC_CALIBRATION = ""
+
 # === train configs
 config.TRAIN = edict()
 config.TRAIN.LR = 0.001
